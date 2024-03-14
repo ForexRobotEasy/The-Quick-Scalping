@@ -1,0 +1,76 @@
+
+//+------------------------------------------------------------------+
+//|                                                      The Quick Scalping |
+//|                   Copyright 2022, Forex Robot Easy Team                   |
+//|                                                      https://forexroboteasy.com |
+//+------------------------------------------------------------------+
+
+#property strict
+#property indicator_chart_window
+
+// Input parameters
+input int MA_Period = 20;   // Moving Average period
+input double Sensitivity = 0.5;   // Sensitivity value
+
+// Global variables
+int MA_Handle;   // Moving Average handle
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Create Moving Average
+   MA_Handle = iMA(NULL, 0, MA_Period, 0, MODE_SMA, PRICE_CLOSE);
+   
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   // Delete Moving Average
+   ObjectDelete('MA_Object');
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   // Filter out short-term price fluctuations
+   double ma_value = iMA(NULL, 0, MA_Period, 0, MODE_SMA, PRICE_CLOSE, prev_calculated);
+   
+   // Calculate the difference between current price and Moving Average
+   double diff = close[rates_total - 1] - ma_value;
+   
+   // Buy signal
+   if(diff > Sensitivity)
+   {
+      // Place buy order
+      // ...
+   }
+   
+   // Sell signal
+   if(diff < -Sensitivity)
+   {
+      // Place sell order
+      // ...
+   }
+   
+   // Draw Moving Average on the chart
+   ObjectCreate('MA_Object', OBJ_TREND, 0, Time[0], ma_value, Time[rates_total - 1], ma_value);
+   
+   return(rates_total);
+}
